@@ -15,13 +15,13 @@ Arithmetic Calculator REST API project. This is a web platform designed to provi
 1. Clone the repository:
 
 ```bash
-git clone https://github.com/GiulianaEOlmos/serverless-backend-truenorth
+git clone git@github.com:GiulianaEOlmos/LoanPro-Backend-Serverless.git
 ```
 
 2. Navigate to the project directory:
 
 ```bash
-cd serverless-backend-truenorth
+cd LoanPro-Backend-Serverless
 ```
 
 3. Install the dependencies:
