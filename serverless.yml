@@ -1,0 +1,115 @@
+service: serverless-backend-truenorth
+frameworkVersion: "3"
+
+provider:
+  name: aws
+  runtime: nodejs16.x
+
+functions:
+  login:
+    handler: ./src/lambdas/login.handler
+    events:
+      - http:
+          path: /v1/login
+          method: post
+          cors: true
+    iamRoleStatements:
+      - Effect: Allow
+        Action:
+          - dynamodb:GetItem
+        Resource:
+          Fn::GetAtt: [UsersTable, Arn]
+  getUserData:
+    handler: ./src/lambdas/getUserData.handler
+    events:
+      - http:
+          path: /v1/getUserData
+          method: post
+          cors: true
+    iamRoleStatements:
+      - Effect: Allow
+        Action:
+          - dynamodb:GetItem
+        Resource:
+          Fn::GetAtt: [UsersTable, Arn]
+  newOperation:
+    handler: ./src/lambdas/newOperation.handler
+    events:
+      - http:
+          path: /v1/newOperation
+          method: post
+          cors: true
+    iamRoleStatements:
+      - Effect: Allow
+        Action:
+          - dynamodb:PutItem
+        Resource:
+          Fn::GetAtt: [RecordsTable, Arn]
+      - Effect: Allow
+        Action:
+          - dynamodb:UpdateItem
+        Resource:
+          Fn::GetAtt: [UsersTable, Arn]
+  getRecords:
+    handler: ./src/lambdas/getRecords.handler
+    events:
+      - http:
+          path: /v1/getRecords
+          method: post
+          cors: true
+    iamRoleStatements:
+      - Effect: "Allow"
+        Action:
+          - dynamodb:Scan
+        Resource:
+          Fn::GetAtt: [RecordsTable, Arn]
+  deleteRecords:
+    handler: ./src/lambdas/deleteRecords.handler
+    events:
+      - http:
+          path: /v1/deleteRecords
+          method: post
+          cors: true
+    iamRoleStatements:
+      - Effect: "Allow"
+        Action:
+          - dynamodb:UpdateItem
+        Resource:
+          Fn::GetAtt: [RecordsTable, Arn]
+
+resources:
+  Resources:
+    UsersTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: Users
+        AttributeDefinitions:
+          - AttributeName: userID
+            AttributeType: S
+        KeySchema:
+          - AttributeName: userID
+            KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: 100
+          WriteCapacityUnits: 5
+
+    RecordsTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: Records
+        AttributeDefinitions:
+          - AttributeName: id
+            AttributeType: S
+          - AttributeName: userID
+            AttributeType: S
+        KeySchema:
+          - AttributeName: id
+            KeyType: HASH
+          - AttributeName: userID
+            KeyType: RANGE
+        ProvisionedThroughput:
+          ReadCapacityUnits: 100
+          WriteCapacityUnits: 100
+
+plugins:
+  - serverless-iam-roles-per-function
